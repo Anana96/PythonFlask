@@ -5,19 +5,42 @@ from flask import request
 import html as utils
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from flask import Response
-from app import app
+from app import app, send, pdata
 from flask_cors import CORS
+from flask import render_template
+from flask import redirect
+from flask import url_for
 
 CORS(app)
 
 @app.route('/')
 @app.route('/index')
 def index():
-    return "Hello, World!"
+    return render_template('index.html', send_url="/send")
 
 
 def send_msg_from_site(name, email, message):
+    sender = send.Sender()
+
+    html_text = """<html>
+            <body>
+                 <h1>От: """ + name +  """</h1>
+                 <h2>Email: """+email+"""</h2>
+                 <h3>Сообщение:</h3>
+                 <div>"""+message+"""</div>
+             </body>
+         </html>"""
+
+
+    sender.send_via_smtp(email_from_smtp = pdata.from_smtp,
+                         key = pdata.from_key,
+                         email_from = pdata.from_email,
+                         email_to = pdata.to_email,
+                         subject = "письмо из flask",
+                         html_text =html_text,
+                         plain_text= message +" " + email + " "+ message,
+                         cid_images=[],
+                         attachments=[])
     pass
 
 
@@ -42,14 +65,6 @@ def send_email():
             return ""
         return (utils.escape(strip_size(l, text))).strip()
 
-    respons = ("""<html>
-    <body>
-        <p>Спасибо за Ваше письмо.</p>
-        <strong>Наши специалисты ответят Вам в кратчайшие сроки.</strong>
-        <p>С  искренним уважением,</p>
-        <p>ООО &laquo;FooBar&raquo;</p>
-    </body></html>""")
-
     name = escape_strip(1000, 'send-name')
     email = escape_strip(1000, 'send-email')
     message = escape_strip(10000, 'send-message')
@@ -58,6 +73,10 @@ def send_email():
         return "Ошибка. Поля формы не заполнены."
 
     send_msg_from_site(name, email, message)
-    return Response(respons, mimetype="text/html")
+    return redirect(url_for('email_response'))
+
+@app.route('/response')
+def email_response():
+    return render_template('response.html', company="FooBar")
 
 

@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Пожалуйста, введите Ваши данные</title>
+</head>
+<body>
+    <form action="{{ send_url }}" method="post"  novalidate>
+     <div>Ваше имя</div>
+     <input name="send-name" type="text" placeholder="Ваше имя" aria-label="Ваше имя"/>
+     <div>Ваш E-mail адрес</div>
+     <input name="send-email" type="text" placeholder="Ваш e-mail адрес"/>
+     <div>Ваше сообщение</div>
+     <div>
+         <textarea name = "send-message" rows="9" cols="40" placeholder="Ваше сообщение"></textarea>
+     </div>
+    <button role="button">Отправить сообщение</button>
+    </form>
+</body>
+</html>
